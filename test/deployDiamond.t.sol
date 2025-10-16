@@ -7,9 +7,9 @@ import "../contracts/facets/DiamondLoupeFacet.sol";
 import "../contracts/facets/OwnershipFacet.sol";
 import "../contracts/Diamond.sol";
 
-import "./helpers/DiamondUtils.sol";
+import "./helpers/DiamondUpgradeHelper.sol";
 
-contract DiamondDeployer is DiamondUtils, IDiamondCut {
+contract DiamondDeployer is DiamondUpgradeHelper {
     //contract types of facets to be deployed
     Diamond diamond;
     DiamondCutFacet dCutFacet;
@@ -23,37 +23,22 @@ contract DiamondDeployer is DiamondUtils, IDiamondCut {
         dLoupe = new DiamondLoupeFacet();
         ownerF = new OwnershipFacet();
 
-        //upgrade diamond with facets
+        // Upgrade diamond with facets using helper (one-shot add cuts)
+        address[] memory addAddrs = new address[](2);
+        addAddrs[0] = address(dLoupe);
+        addAddrs[1] = address(ownerF);
 
-        //build cut struct
-        FacetCut[] memory cut = new FacetCut[](2);
+        string[] memory names = new string[](2);
+        names[0] = "DiamondLoupeFacet";
+        names[1] = "OwnershipFacet";
 
-        cut[0] = (
-            FacetCut({
-                facetAddress: address(dLoupe),
-                action: FacetCutAction.Add,
-                functionSelectors: generateSelectors("DiamondLoupeFacet")
-            })
+        IDiamondCut.FacetCut[] memory cuts = buildAddCutsByNames(
+            addAddrs,
+            names
         );
-
-        cut[1] = (
-            FacetCut({
-                facetAddress: address(ownerF),
-                action: FacetCutAction.Add,
-                functionSelectors: generateSelectors("OwnershipFacet")
-            })
-        );
-
-        //upgrade diamond
-        IDiamondCut(address(diamond)).diamondCut(cut, address(0x0), "");
+        executeDiamondCut(IDiamondCut(address(diamond)), cuts, address(0), "");
 
         //call a function
         DiamondLoupeFacet(address(diamond)).facetAddresses();
     }
-
-    function diamondCut(
-        FacetCut[] calldata _diamondCut,
-        address _init,
-        bytes calldata _calldata
-    ) external override {}
 }

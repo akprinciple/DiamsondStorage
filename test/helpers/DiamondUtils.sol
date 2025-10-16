@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.0;
+
 import "forge-std/Test.sol";
 import "solidity-stringutils/strings.sol";
 
@@ -7,24 +10,20 @@ abstract contract DiamondUtils is Test {
     function generateSelectors(
         string memory _facetName
     ) internal returns (bytes4[] memory selectors) {
-        //get string of contract methods
-        string[] memory cmd = new string[](4);
+        // get JSON string of contract methods
+        string[] memory cmd = new string[](5);
         cmd[0] = "forge";
         cmd[1] = "inspect";
         cmd[2] = _facetName;
         cmd[3] = "methods";
+        cmd[4] = "--json";
         bytes memory res = vm.ffi(cmd);
         string memory st = string(res);
 
         // extract function signatures and take first 4 bytes of keccak
         strings.slice memory s = st.toSlice();
-
-        // Skip TRACE lines if any
-        strings.slice memory nl = "\n".toSlice();
-        strings.slice memory trace = "TRACE".toSlice();
-        while (s.contains(trace)) {
-            s.split(nl);
-        }
+        // Skip any leading logs by seeking the first JSON brace
+        s.find("{".toSlice());
 
         strings.slice memory colon = ":".toSlice();
         strings.slice memory comma = ",".toSlice();
@@ -36,7 +35,7 @@ abstract contract DiamondUtils is Test {
             // split at colon, extract string up to next doublequote for methodname
             strings.slice memory method = s.split(colon).until(dbquote);
             selectors[i] = bytes4(method.keccak());
-            strings.slice memory selectr = s.split(comma).until(dbquote); // advance s to the next comma
+            s.split(comma).until(dbquote); // advance s to the next comma
         }
         return selectors;
     }
