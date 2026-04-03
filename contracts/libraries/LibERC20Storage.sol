@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 library LibERC20Storage {
+    bytes32 internal constant ERC20_STORAGE_POSITION = keccak256("diamond.erc20.storage");
 
     struct ERC20Storage {
         string name;
@@ -13,8 +14,9 @@ library LibERC20Storage {
     }
 
     function layout() internal pure returns (ERC20Storage storage ds) {
+        bytes32 position = ERC20_STORAGE_POSITION;
         assembly {
-            ds.slot := 0
+            ds.slot := position
         }
     }
 }

@@ -14,9 +14,9 @@ library LibAppStorage {
     }
 
     function appStorage() internal pure returns (AppStorage storage s) {
-        // bytes32 position = APP_STORAGE_POSITION;
+        bytes32 position = APP_STORAGE_POSITION;
         assembly {
-            s.slot := 0
+            s.slot := position
         }
     }
 }

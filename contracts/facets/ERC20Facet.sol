@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 import {LibERC20Storage} from "../libraries/LibERC20Storage.sol";
+import {LibDiamond} from "../libraries/LibDiamond.sol";
 
 contract ERC20Facet {
     event Transfer(address indexed from, address indexed to, uint256 value);
@@ -9,6 +10,7 @@ contract ERC20Facet {
 
     /// @notice Initialize the Token Name, Symbol, and Decimals
     function initERC20(string memory _name, string memory _symbol, uint8 _decimals) external {
+        LibDiamond.enforceIsContractOwner();
         LibERC20Storage.ERC20Storage storage ds = LibERC20Storage.layout();
         require(bytes(ds.name).length == 0, "ERC20Facet: already initialized");
         
@@ -28,7 +30,6 @@ contract ERC20Facet {
     function decimals() external view returns (uint8) {
         return LibERC20Storage.layout().decimals;
     }
-    // git remote set-url origin https://github.com/akprinciple/DiamsondStorage.git
 
     function totalSupply() external view returns (uint256) {
         return LibERC20Storage.layout().totalSupply;

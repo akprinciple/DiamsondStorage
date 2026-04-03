@@ -3,7 +3,6 @@ pragma solidity ^0.8.0;
 
 import {LibAppStorage} from "../libraries/LibAppStorage.sol";
 import {LibDiamond} from "../libraries/LibDiamond.sol";
-import {IERC165} from "../interfaces/IERC165.sol";
 
 interface IERC721Receiver {
     function onERC721Received(address operator, address from, uint256 tokenId, bytes calldata data) external returns (bytes4);
@@ -13,7 +12,7 @@ interface ISVGFacet {
     function generateSVG(uint256 tokenId) external view returns (string memory);
 }
 
-contract ERC721Facet is IERC165 {
+contract ERC721Facet {
     event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
 
     /// @notice Initialize the Token Name and Symbol
@@ -22,13 +21,11 @@ contract ERC721Facet is IERC165 {
         LibAppStorage.AppStorage storage s = LibAppStorage.appStorage();
         s.name = _name;
         s.symbol = _symbol;
-    }
-
-    function supportsInterface(bytes4 interfaceId) external view override returns (bool) {
-        return
-            interfaceId == type(IERC165).interfaceId ||
-            interfaceId == 0x80ac58cd || // ERC721 Interface ID
-            interfaceId == 0x5b5e139f;   // ERC721Metadata Interface ID
+        
+        // Note: You should register your supported interfaces centrally here or in your deployment script.
+        // Example (if using standard LibDiamond):
+        // LibDiamond.addSupportedInterface(0x80ac58cd); // ERC721
+        // LibDiamond.addSupportedInterface(0x5b5e139f); // ERC721Metadata
     }
 
     function name() external view returns (string memory) {
