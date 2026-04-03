@@ -2,7 +2,6 @@
 pragma solidity ^0.8.0;
 
 library LibERC721BorrowerStorage {
-    bytes32 internal constant BORROWER_STORAGE_POSITION = keccak256("diamond.borrower.storage");
 
     struct BorrowedToken {
         address tokenAddress;
@@ -17,9 +16,8 @@ library LibERC721BorrowerStorage {
     }
 
     function layout() internal pure returns (BorrowerStorage storage ds) {
-        bytes32 position = BORROWER_STORAGE_POSITION;
         assembly {
-            ds.slot := position
+            ds.slot := 0
         }
     }
 }

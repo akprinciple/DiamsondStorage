@@ -57,15 +57,13 @@ contract DiamondDeployerTest is Test, DiamondUpgradeHelper {
     }
 
     function testCombinedMarketplaceMultisig() public {
-        ERC721Facet(address(diamond)).initERC721("MockNFT", "MNFT");
-        ERC20Facet(address(diamond)).initERC20("MockToken", "MTK", 18);
         
         address[] memory owners = new address[](2);
         owners[0] = address(this);
         owners[1] = address(0x1337);
         MultisigFacet(address(diamond)).initMultisig(owners, 2);
 
-        uint256 price = 100 ether;
+        uint256 price = 100;
         ERC20Facet(address(diamond)).mintERC20(address(diamond), price);
 
         address seller = address(0x123);

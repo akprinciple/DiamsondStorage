@@ -2,7 +2,6 @@
 pragma solidity ^0.8.0;
 
 library LibMultisigStorage {
-    bytes32 internal constant MULTISIG_STORAGE_POSITION = keccak256("diamond.multisig.storage");
 
     struct Transaction {
         address to;
@@ -21,9 +20,8 @@ library LibMultisigStorage {
     }
 
     function layout() internal pure returns (MultisigStorage storage ds) {
-        bytes32 position = MULTISIG_STORAGE_POSITION;
         assembly {
-            ds.slot := position
+            ds.slot := 0
         }
     }
 }
